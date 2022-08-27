@@ -3,6 +3,22 @@ import bodyParser from 'body-parser';
 import { filterImageFromURL, deleteLocalFiles } from './util/util';
 const path = require('path');
 
+function authentication(req: any, res: any, next: any) {
+    var authheader = req.headers.authentication;
+    console.log(req.headers);
+ 
+    if (!authheader) {
+        res.status(403).send('authentication required to access API');
+    }
+ 
+    if (authheader == 'admin') {
+        // If Authorized user
+        next();
+    } else {
+        res.status(401).send('unauthorized');
+    }
+}
+
 (async () => {
 
   // Init the Express application
@@ -29,6 +45,7 @@ const path = require('path');
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
 
   /**************************************************************************** */
+  app.use(authentication)
   app.get("/filteredimage", async ( req, res ) => {
     let image_url = req.query.image_url;
 
