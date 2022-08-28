@@ -45,19 +45,21 @@ function authentication(req: any, res: any, next: any) {
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
 
   /**************************************************************************** */
-  app.use(authentication)
+  // app.use(authentication)
   app.get("/filteredimage", async ( req, res ) => {
     let image_url = req.query.image_url;
-
+    let filepath = '';
     var regexpression = 
       /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
     
     if (!regexpression.test(image_url)) {
       res.send('URL is invalid!');
     }
-
-    let filepath = await filterImageFromURL(image_url);
-
+    try {
+      filepath = await filterImageFromURL(image_url);
+    } catch (err) {
+      res.status(422).send(err);
+    }
     // console.log(filepath);
     const directoryPath = path.join(__dirname, 'util/tmp/');
 
